@@ -15,20 +15,19 @@ __all__ = ["CeleryIO", "tqdm_celery", "tsrange", "tqdm", "trange"]
 
 
 class CeleryIO(MonoWorker):
-    """Non-blocking file-like IO using a Slack app."""
+    """Non-blocking file-like IO using a Celery app."""
 
     def __init__(self, brokend_url, backend_url, name_task):
         """Creates a new message in the given `channel`."""
         super().__init__()
 
         self.client = Celery(
-            "tasks",
             broker=brokend_url,
             backend=backend_url,
         )
         self.name_task = name_task
         self.data = self.__class__.__name__
-        
+
         try:
             self.client.backend.client.ping()
         except:
@@ -60,14 +59,13 @@ class CeleryIO(MonoWorker):
 
 class tqdm_celery(tqdm_auto):
     """
-    Standard `tqdm.auto.tqdm` but also sends updates to a Slack app.
+    Standard `tqdm.auto.tqdm` but also sends updates to a Celery app.
     May take a few seconds to create (`__init__`).
 
-    - create a Slack app with the `chat:write` scope & invite it to a
-      channel: <https://api.slack.com/authentication/basics>
-    - copy the bot `{token}` & `{channel}` and paste below
+    - copy the `{task_id}`, `{backend_url}`, `{brokend_url}`, `{name_task}`,  and paste below
     >>> from tqdm.contrib.slack import tqdm, trange
-    >>> for i in tqdm(iterable, token='{token}', channel='{channel}'):
+    >>> for i in tqdm(iterable, task_id='{task_id}', backend_url='{backend_url}', 
+        brokend_url='{brokend_url}', name_task='{name_task}'):
     ...     ...
     """
 
@@ -110,7 +108,6 @@ class tqdm_celery(tqdm_auto):
 
 
 def tsrange(*args, **kwargs):
-    """Shortcut for `tqdm.contrib.slack.tqdm(range(*args), **kwargs)`."""
     return tqdm_celery(range(*args), **kwargs)
 
 

@@ -9,7 +9,6 @@ BACKEND_URL = environ.get("BACKEND_URL", "redis://localhost:6379/1")
 NAME_TASK = environ.get("NAME_TASK", "process_progess_bard")
 
 app = Celery(
-    "tasks",
     broker=BROKER_URL,
     backend=BACKEND_URL,
 )
